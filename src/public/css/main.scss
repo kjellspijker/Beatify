@@ -1,9 +1,15 @@
-@import "themes/default/variables";
+@import "themes/slate/variables";
 
 @import "lib/bootstrap/bootstrap";
 @import "lib/font-awesome/font-awesome";
 
-@import "themes/default/default";
+@import "themes/slate/slate";
+
+.logo-header {
+  max-width: 2rem;
+  max-height: 2rem;
+  display: inline-block !important;
+}
 
 // Scaffolding
 // -------------------------
