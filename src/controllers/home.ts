@@ -1,4 +1,8 @@
 import { Request, Response } from "express";
+import passport = require("passport");
+import { IVerifyOptions } from "passport-local";
+import { nextTick } from "async";
+const randToken = require("rand-token");
 
 /**
  * GET /
@@ -7,5 +11,15 @@ import { Request, Response } from "express";
 export let index = (req: Request, res: Response) => {
   res.render("home", {
     title: "Home"
+  });
+};
+
+export let login = (req: Request, res: Response) => {
+  console.log(req.param("username"));
+  res.render("home", {
+    title: "Home",
+    user: {
+      username: req.param("username")
+    }
   });
 };

@@ -1,0 +1,116 @@
+extend layout
+
+block content
+  section
+    .row.w-100.m-0.vh-100-calc
+      .col-lg-2.col-sm-0
+      .col-lg-10.col-sm-12.pt-2.searchHolder
+        #searchTitle
+          h4.display-4.text-center #{partyName}: 
+            span#partyIdHolder
+            script.
+              $(document).ready(function() {
+                var partyId = "#{partyId}";
+                var text = "";
+                for (var i = 0; i < partyId.length; i += 2) {
+                  text += partyId.substr(i, 2) + " ";
+                }
+                $("#partyIdHolder").text(text);
+              });
+          .input-group.px-3.pb-3
+              input.form-control(type="text", placeholder="Add some music...", aria-label="Song")
+        #songResultHolder
+          .row.song.bg-song-light
+            | Test song
+          .row.song.bg-song-dark
+            | Second test song
+          .row.song.bg-song-light
+            | Test song
+          .row.song.bg-song-dark
+            | Second test song
+          .row.song.bg-song-light
+            | Test song
+          .row.song.bg-song-dark
+            | Second test song
+          .row.song.bg-song-light
+            | Test song
+          .row.song.bg-song-dark
+            | Second test song
+          .row.song.bg-song-light
+            | Test song
+          .row.song.bg-song-dark
+            | Second test song
+          .row.song.bg-song-light
+            | Test song
+          .row.song.bg-song-dark
+            | Second test song
+          .row.song.bg-song-light
+            | Test song
+          .row.song.bg-song-dark
+            | Second test song
+          .row.song.bg-song-light
+            | Test song
+          .row.song.bg-song-dark
+            | Second test song
+          .row.song.bg-song-light
+            | Test song
+          .row.song.bg-song-dark
+            | Second test song
+          .row.song.bg-song-light
+            | Test song
+          .row.song.bg-song-dark
+            | Second test song
+          .row.song.bg-song-light
+            | Test song
+          .row.song.bg-song-dark
+            | Second test song
+          .row.song.bg-song-light
+            | Test song
+          .row.song.bg-song-dark
+            | Second test song
+          .row.song.bg-song-light
+            | Test song
+          .row.song.bg-song-dark
+            | Second test song
+          .row.song.bg-song-light
+            | Test song
+          .row.song.bg-song-dark
+            | Second test song
+          .row.song.bg-song-light
+            | Test song
+          .row.song.bg-song-dark
+            | Second test song
+          .row.song.bg-song-light
+            | Test song
+          .row.song.bg-song-dark
+            | Second test song
+          .row.song.bg-song-light
+            | Test song
+          .row.song.bg-song-dark
+            | Second test song
+          .row.song.bg-song-light
+            | Test song
+          .row.song.bg-song-dark
+            | Second test song
+          .row.song.bg-song-light
+            | Test song
+          .row.song.bg-song-dark
+            | Second test song
+      .w-100.d-block.d-lg-none
+      .col-lg-2.col-sm-12.py-2.sideBarHolder
+        | Lorem ipsum dolor sit amet, consectetur adipiscing elit. Aenean dapibus diam a purus hendrerit ultricies. Donec ac ante tincidunt, vestibulum lectus tempor, pulvinar nisl. Vivamus sed nulla sed elit laoreet placerat ac at ligula. Sed tempor vestibulum mauris vel molestie. Sed sed dolor sit amet massa tincidunt tempus. Nullam sit amet ante ante. Pellentesque suscipit est velit.
+        | Aliquam eu odio eu lectus auctor laoreet. In maximus porta rutrum. Pellentesque tincidunt tincidunt fermentum.
+        | Lorem ipsum dolor sit amet, consectetur adipiscing elit. Aenean dapibus diam a purus hendrerit ultricies. Donec ac ante tincidunt, vestibulum lectus tempor, pulvinar nisl. Vivamus sed nulla sed elit laoreet placerat ac at ligula. Sed tempor vestibulum mauris vel molestie. Sed sed dolor sit amet massa tincidunt tempus. Nullam sit amet ante ante. Pellentesque suscipit est velit.
+        | Aliquam eu odio eu lectus auctor laoreet. In maximus porta rutrum. Pellentesque tincidunt tincidunt fermentum.
+        | Lorem ipsum dolor sit amet, consectetur adipiscing elit. Aenean dapibus diam a purus hendrerit ultricies. Donec ac ante tincidunt, vestibulum lectus tempor, pulvinar nisl. Vivamus sed nulla sed elit laoreet placerat ac at ligula. Sed tempor vestibulum mauris vel molestie. Sed sed dolor sit amet massa tincidunt tempus. Nullam sit amet ante ante. Pellentesque suscipit est velit.
+        | Aliquam eu odio eu lectus auctor laoreet. In maximus porta rutrum. Pellentesque tincidunt tincidunt fermentum.
+            
+//- var ws = new WebSocket("ws://localhost:3001");
+//- ws.onopen = function (event) {
+//-   console.log("Connected");
+//-   ws.send("Hello, World!");
+//- }
+
+//- ws.onmessage = function(event) {
+//-   console.log(event.data);
+//- }

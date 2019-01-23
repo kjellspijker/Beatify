@@ -1,32 +1,66 @@
+//- doctype html
+//- html(lang='')
+//-   head
+//-     meta(charset='utf-8')
+//-     meta(http-equiv='X-UA-Compatible', content='IE=edge')
+//-     meta(name='viewport', content='width=device-width, initial-scale=1.0')
+//-     title #{title} - Beatify
+//-     meta(name='description', content='')
+//-     meta(name='theme-color' content='#4DA5F4')
+//-     meta(name='csrf-token', content=_csrf)
+//-     link(rel='shortcut icon', href='/images/logo.png')
+//-     link(rel='stylesheet', href='/css/main.css')
+
+//-   body
+//-     include partials/header
+
+//-     .container
+//-       include partials/flash
+//-       block content
+
+//-     include partials/footer
+
+//-     script(src='https://code.jquery.com/jquery-3.3.1.min.js')
+//-     script(src='/js/lib/bootstrap.min.js')
+//-     script(async defer src="https://buttons.github.io/buttons.js")
+//-     script(src='/js/main.js')
+
+//-     //- Google Analytics: change UA-38177297-2 to be your site's ID
+//-     script.
+//-       window.ga=function(){ga.q.push(arguments)};ga.q=[];ga.l=+new Date;
+//-       ga('create','UA-38177297-2','auto');ga('send','pageview')
+//-     script(src='https://www.google-analytics.com/analytics.js' async defer)
 doctype html
-html(lang='')
+html(lang='en')
   head
     meta(charset='utf-8')
-    meta(http-equiv='X-UA-Compatible', content='IE=edge')
-    meta(name='viewport', content='width=device-width, initial-scale=1.0')
-    title #{title} - Hackathon Starter
+    meta(name='viewport', content='width=device-width, initial-scale=1, shrink-to-fit=no')
     meta(name='description', content='')
-    meta(name='theme-color' content='#4DA5F4')
-    meta(name='csrf-token', content=_csrf)
+    meta(name='author', content='Kjell Spijker')
+    title #{title} - Beatify
     link(rel='shortcut icon', href='/images/logo.png')
+    // Bootstrap core CSS
     link(rel='stylesheet', href='/css/main.css')
-
-  body
-    include partials/header
-
-    .container
-      include partials/flash
-      block content
-
-    include partials/footer
-
+    // Custom fonts for this template
+    link(href='https://fonts.googleapis.com/css?family=Catamaran:100,200,300,400,500,600,700,800,900', rel='stylesheet')
+    link(href='https://fonts.googleapis.com/css?family=Lato:100,100i,300,300i,400,400i,700,700i,900,900i', rel='stylesheet')
     script(src='https://code.jquery.com/jquery-3.3.1.min.js')
+    // Custom styles for this template
+    link(href='css/one-page-wonder.min.css', rel='stylesheet')
+  body
+    // Navigation
+    .temp
+      include partials/header
+      block header
+      
+      include partials/flash
+      .main-content
+        block content
+      
+    // Footer
+    include partials/footer
+    // /.container
+    // Bootstrap core JavaScript
     script(src='/js/lib/bootstrap.min.js')
     script(async defer src="https://buttons.github.io/buttons.js")
     script(src='/js/main.js')
-
-    //- Google Analytics: change UA-38177297-2 to be your site's ID
-    script.
-      window.ga=function(){ga.q.push(arguments)};ga.q=[];ga.l=+new Date;
-      ga('create','UA-38177297-2','auto');ga('send','pageview')
-    script(src='https://www.google-analytics.com/analytics.js' async defer)

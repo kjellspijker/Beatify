@@ -1,13 +1,22 @@
-.navbar.navbar-expand-lg.fixed-top.navbar-dark.bg-primary
-  .container
-    .navbar-header
-      button.navbar-toggler(type='button', data-toggle='collapse', data-target='#navbarResponsive', aria-controls='navbarResponsive', aria-expanded="false", aria-label="Toggle navigation")
-        span.navbar-toggler-icon
-      a.navbar-brand(href='/')
-        img.logo-header(src="/images/logo.png", alt="Beatify Logo")
-        | &nbsp; Beatify
-    .collapse.navbar-collapse#navbarResponsive
-      ul.navbar-nav
-        li(class=(title == 'Home') ? 'active' : undefined)
-          a(href='/') Home
-      ul.nav.navbar-nav.navbar-right
+nav.navbar.navbar-expand-lg.navbar-dark.navbar-custom(class=page == "party" ? "dark-navbar" : "fixed-top")
+      .container
+        a.navbar-brand(href='/')
+          img.logo-header(src="/images/logo.png", alt="Beatify Logo")
+          | &nbsp; Beatify
+        button.navbar-toggler(data-target='#navbarResponsive', data-toggle='collapse', type='button', aria-controls='navbarResponsive', aria-expanded='false', aria-label='Toggle navigation')
+          span.navbar-toggler-icon
+        #navbarResponsive.collapse.navbar-collapse
+          ul.navbar-nav.ml-auto
+            if !user
+              li.nav-item.dropdown
+                a#login.nav-link.dropdown-toggle(data-toggle="dropdown") Login
+                .dropdown-menu.navbar-custom(aria-labelledby="login")
+                  .social-buttons
+                    a.btn.btn-success.spotify(href="/auth/spotify")
+                      i.fa.fa-spotify
+                      | Login with Spotify
+            else
+              li.nav-item.dropdown
+                a#logout.nav-link.dropdown-toggle(data-toggle="dropdown") Welcome, #{user.username}
+                .dropdown-menu.navbar-custom(aria-labelledby="logout")
+                  a.nav-link(href="/logout") Logout

@@ -1,0 +1,10 @@
+extends layout
+
+block content
+    canvas#qrCanvas
+    script(src="/js/lib/qrcode.min.js")
+    script.
+        QRCode.toCanvas(document.getElementById('qrCanvas'), "#{url}", function (error) {
+            if (error) console.error(error);
+            console.log("Success!");
+        });

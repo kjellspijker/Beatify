@@ -1,27 +1,57 @@
 extends layout
 
+block header
+  header.masthead.text-center.text-white
+      .masthead-content
+        .container
+          h1.masthead-heading.mb-0 Beatify
+          h2.masthead-subheading.mb-0 All you add is Music!
+          if user
+            .masthead-btn-holder
+              a.btn.btn-primary.btn-xl.rounded-pill.mt-5(href='/party/' + user.id) Create a party
+            .masthead-btn-holder
+              a.btn.btn-primary.btn-xl.rounded-pill.mt-3(href='#') Join a party
+          else
+            .masthead-btn-holder
+              a#spotify-login-btn.btn.btn-primary.btn-xl.rounded-pill.mt-5(href="/auth/spotify")
+                i.fa.fa-spotify
+                |&nbsp; Login with Spotify
+      .bg-circle-1.bg-circle
+      .bg-circle-2.bg-circle
+      .bg-circle-3.bg-circle
+      .bg-circle-4.bg-circle
+
 block content
-  h1 Hackathon Starter
-  p.lead A boilerplate for Node.js web applications.
-  hr
-  .row
-    .col-sm-6
-      h2 Heading
-      p Donec id elit non mi porta gravida at eget metus. Fusce dapibus, tellus ac cursus commodo, tortor mauris condimentum nibh, ut fermentum massa justo sit amet risus. Etiam porta sem malesuada magna mollis euismod. Donec sed odio dui.
-      p
-        a.btn.btn-default(href='#', role='button') View details »
-    .col-sm-6
-      h2 Heading
-      p Donec id elit non mi porta gravida at eget metus. Fusce dapibus, tellus ac cursus commodo, tortor mauris condimentum nibh, ut fermentum massa justo sit amet risus. Etiam porta sem malesuada magna mollis euismod. Donec sed odio dui.
-      p
-        a.btn.btn-default(href='#', role='button') View details »
-    .col-sm-6
-      h2 Heading
-      p Donec id elit non mi porta gravida at eget metus. Fusce dapibus, tellus ac cursus commodo, tortor mauris condimentum nibh, ut fermentum massa justo sit amet risus. Etiam porta sem malesuada magna mollis euismod. Donec sed odio dui.
-      p
-        a.btn.btn-default(href='#', role='button') View details »
-    .col-sm-6
-      h2 Heading
-      p Donec id elit non mi porta gravida at eget metus. Fusce dapibus, tellus ac cursus commodo, tortor mauris condimentum nibh, ut fermentum massa justo sit amet risus. Etiam porta sem malesuada magna mollis euismod. Donec sed odio dui.
-      p
-        a.btn.btn-default(href='#', role='button') View details »
+  section
+    .container
+      .row.align-items-center
+        .col-lg-6.order-lg-2
+          .p-5
+            img.img-fluid.rounded-circle(src='img/01.jpg', alt='')
+        .col-lg-6.order-lg-1
+          .p-5
+            h2.display-4 For those about to rock...
+            p
+              | Lorem ipsum dolor sit amet, consectetur adipisicing elit. Quod aliquid, mollitia odio veniam sit iste esse assumenda amet aperiam exercitationem, ea animi blanditiis recusandae! Ratione voluptatum molestiae adipisci, beatae obcaecati.
+  section
+    .container
+      .row.align-items-center
+        .col-lg-6
+          .p-5
+            img.img-fluid.rounded-circle(src='img/02.jpg', alt='')
+        .col-lg-6
+          .p-5
+            h2.display-4 We salute you!
+            p
+              | Lorem ipsum dolor sit amet, consectetur adipisicing elit. Quod aliquid, mollitia odio veniam sit iste esse assumenda amet aperiam exercitationem, ea animi blanditiis recusandae! Ratione voluptatum molestiae adipisci, beatae obcaecati.
+  section
+    .container
+      .row.align-items-center
+        .col-lg-6.order-lg-2
+          .p-5
+            img.img-fluid.rounded-circle(src='img/03.jpg', alt='')
+        .col-lg-6.order-lg-1
+          .p-5
+            h2.display-4 Let there be rock!
+            p
+              | Lorem ipsum dolor sit amet, consectetur adipisicing elit. Quod aliquid, mollitia odio veniam sit iste esse assumenda amet aperiam exercitationem, ea animi blanditiis recusandae! Ratione voluptatum molestiae adipisci, beatae obcaecati.
