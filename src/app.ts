@@ -20,6 +20,7 @@ import { SPOTIFY_CLIENT_ID, SPOTIFY_CLIENT_SECRET, SPOTIFY_CALLBACK_URL } from "
 import { main } from "./util/websocket";
 const SpotifyStrategy = require("passport-spotify").Strategy;
 const randToken = require("rand-token");
+const request = require("request");
 
 const MongoStore = mongo(session);
 
@@ -94,7 +95,7 @@ passport.serializeUser(function (user: UserModel, done) {
 });
 
 passport.deserializeUser(function (spotifyId, done) {
-  User.findOne({spotifyId: spotifyId}, function(err, user) {
+  User.findOne({ spotifyId: spotifyId }, function (err, user) {
     done(err, user);
   });
 });
@@ -106,18 +107,20 @@ passport.use(new SpotifyStrategy(
     callbackURL: SPOTIFY_CALLBACK_URL
   },
   function (accessToken: string, refreshToken: string, expires_in: number, profile: any, done: any) {
-    User.findOne({spotifyId: profile.id}, function (err, user) {
+    User.findOne({ spotifyId: profile.id }, function (err, user) {
       if (err) {
         return done(err);
       }
       if (!user) {
         user = new User({
+          accessToken: accessToken,
+          refreshToken: refreshToken,
           username: profile.username,
           email: profile.emails[0].value,
           country: profile.country,
           spotifyId: profile.id
         });
-        user.save(function(err) {
+        user.save(function (err) {
           if (err) console.log(err);
           return done(err, user);
         });
@@ -146,19 +149,20 @@ app.get("/auth/spotify", passport.authenticate("spotify", {
 const pid = 2;
 
 app.get("/party/:id", function (req, res) {
-  Party.findOne({owner: req.params.id}, async function (err, party: PartyModel) {
+  Party.findOne({ owner: req.params.id }, async function (err, party: PartyModel) {
     if (err) {
       req.flash("errors", err);
       return res.redirect("/");
     }
     if (!party) {
-      await generateParty(req.params.id).then(function(p: PartyModel) {
+      await generateParty(req.params.id).then(function (p: PartyModel) {
         party = p;
       });
-  }
+    }
     res.render("party", {
       page: "party",
       title: req.user.username + "'s party",
+      accessToken: req.user.accessToken,
       partyId: party.get("partyId"),
       partyName: party.get("name"),
       url: "http://192.168.1.13:3000/join/" + party.id
@@ -185,6 +189,31 @@ app.get("/auth/spotify/callback", passport.authenticate("spotify", { failureRedi
     res.redirect("/");
   }
 );
+
+app.get("/auth/spotify/refreshAccessToken", (req, res) => {
+  res.setHeader("Content-Type", "application/json");
+  const refreshToken = req.user.refreshToken;
+  request.post("https://accounts.spotify.com/api/token", {
+    form: {
+      grant_type: "refresh_token",
+      refresh_token: refreshToken
+    },
+    headers: {
+      Authorization: "Basic " + Buffer.from(SPOTIFY_CLIENT_ID + ":" + SPOTIFY_CLIENT_SECRET).toString("base64"),
+      "Content-Type": "application/x-www-form-urlencoded"
+    }
+  }, (err: any, httpResponse: any, body: any) => {
+    if (err) {
+      console.error(err);
+      res.send(JSON.stringify({error: "spotify-error", message: err}));
+    } else {
+      const data = JSON.parse(body);
+      req.user.accessToken = data.access_token;
+      User.updateOne({_id: req.user.id }, {accessToken: data.access_token});
+      res.send(JSON.stringify({accessToken: data.access_token}));
+    }
+  });
+});
 
 app.get("/logout", function (req, res) {
   req.logout();

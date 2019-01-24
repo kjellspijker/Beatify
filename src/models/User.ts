@@ -2,6 +2,8 @@ import mongoose from "mongoose";
 import { NextFunction } from "express";
 
 export type UserModel = mongoose.Document & {
+    accessToken: string,
+    refreshToken: string,
     spotifyId: string,
     email: string,
     username: string,
@@ -11,6 +13,8 @@ export type UserModel = mongoose.Document & {
 
 const userSchema = new mongoose.Schema({
     spotifyId: {type: String, unique: true},
+    accessToken: String,
+    refreshToken: String,
     email: String,
     username: String,
     country: String

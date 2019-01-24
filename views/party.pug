@@ -17,84 +17,12 @@ block content
                 $("#partyIdHolder").text(text);
               });
           .input-group.px-3.pb-3
-              input.form-control(type="text", placeholder="Add some music...", aria-label="Song")
-        #songResultHolder
-          .row.song.bg-song-light
-            | Test song
-          .row.song.bg-song-dark
-            | Second test song
-          .row.song.bg-song-light
-            | Test song
-          .row.song.bg-song-dark
-            | Second test song
-          .row.song.bg-song-light
-            | Test song
-          .row.song.bg-song-dark
-            | Second test song
-          .row.song.bg-song-light
-            | Test song
-          .row.song.bg-song-dark
-            | Second test song
-          .row.song.bg-song-light
-            | Test song
-          .row.song.bg-song-dark
-            | Second test song
-          .row.song.bg-song-light
-            | Test song
-          .row.song.bg-song-dark
-            | Second test song
-          .row.song.bg-song-light
-            | Test song
-          .row.song.bg-song-dark
-            | Second test song
-          .row.song.bg-song-light
-            | Test song
-          .row.song.bg-song-dark
-            | Second test song
-          .row.song.bg-song-light
-            | Test song
-          .row.song.bg-song-dark
-            | Second test song
-          .row.song.bg-song-light
-            | Test song
-          .row.song.bg-song-dark
-            | Second test song
-          .row.song.bg-song-light
-            | Test song
-          .row.song.bg-song-dark
-            | Second test song
-          .row.song.bg-song-light
-            | Test song
-          .row.song.bg-song-dark
-            | Second test song
-          .row.song.bg-song-light
-            | Test song
-          .row.song.bg-song-dark
-            | Second test song
-          .row.song.bg-song-light
-            | Test song
-          .row.song.bg-song-dark
-            | Second test song
-          .row.song.bg-song-light
-            | Test song
-          .row.song.bg-song-dark
-            | Second test song
-          .row.song.bg-song-light
-            | Test song
-          .row.song.bg-song-dark
-            | Second test song
-          .row.song.bg-song-light
-            | Test song
-          .row.song.bg-song-dark
-            | Second test song
-          .row.song.bg-song-light
-            | Test song
-          .row.song.bg-song-dark
-            | Second test song
-          .row.song.bg-song-light
-            | Test song
-          .row.song.bg-song-dark
-            | Second test song
+            .input-group-prepend
+              span.input-group-text#searchInputPrepend
+                i.fas.fa-compact-disc#disc-prepend.active-prepend
+                i.fas.fa-arrow-left#back-prepend.inactive-prepend
+            input#searchInput.form-control(type="text", aria-label="Song", placeholder="Add some music..." aria-describedby="searchInputPrepend")
+        #songResultHolder.songHolder
       .w-100.d-block.d-lg-none.order-lg-2
       .col-lg-2.col-sm-12.py-2.sideBarHolder.order-lg-1
         | Lorem ipsum dolor sit amet, consectetur adipiscing elit. Aenean dapibus diam a purus hendrerit ultricies. Donec ac ante tincidunt, vestibulum lectus tempor, pulvinar nisl. Vivamus sed nulla sed elit laoreet placerat ac at ligula. Sed tempor vestibulum mauris vel molestie. Sed sed dolor sit amet massa tincidunt tempus. Nullam sit amet ante ante. Pellentesque suscipit est velit.
@@ -105,6 +33,97 @@ block content
         | Aliquam eu odio eu lectus auctor laoreet. In maximus porta rutrum. Pellentesque tincidunt tincidunt fermentum.3
         .small-text
           | SPACER
+    script.
+      const songHTML = '<div class="row song container-fluid"><img class="col-2 px-0 img-fluid d-inline-block albumCover" src="https://i.scdn.co/image/ecd0fcd1e6202f2d1625e540cfd44acf1fac7f53"><div class="songInfo col-10 col-sm-9 col-lg-10 d-inline-block"><h5 class="songName">Now this is a very long song name of some long song that is in the spotify database</h5><div class="artistQueue"> <span class="artistName">Disturbed</span><span class="bar">&nbsp;| </span><span class="QueueStatus">Not in Queue</span></div></div><div class="col d-flex align-items-center justify-content-center justify-content-sm-end"><div class="btn btn-add-song"><span class="fas fa-plus"></span></div></div></div>';
+      let accessToken = "#{accessToken}";
+      $(document).ready(function() {
+        const searchInput = $("#searchInput")[0];
+        const songResultHolder = $("#songResultHolder")[0];
+        let autoSearchTimer = undefined;
+        let searchVal = "";
+        $(searchInput).on("input", function(event) {
+          if (event.target.value.length > 0) {
+            $("#disc-prepend").removeClass("active-prepend").addClass("inactive-prepend");
+            $("#back-prepend").removeClass("inactive-prepend").addClass("active-prepend");
+          } else {
+            $("#disc-prepend").removeClass("inactive-prepend").addClass("active-prepend");
+            $("#back-prepend").removeClass("active-prepend").addClass("inactive-prepend");
+          }
+          if (autoSearchTimer !== undefined) {
+            clearTimeout(autoSearchTimer);
+          }
+          searchVal = event.target.value;
+          autoSearchTimer = setTimeout(inputChanged, 750)
+        });
+        function inputChanged() {
+              if (searchVal === "") {
+                //TODO switch back to queue view
+                return;
+              }
+              //TODO switch to search view
+              console.log("Search for: \"" + searchVal + "\"");
+              //TODO add proper market value for owning party
+              // currently defaults to authenticated market of the authenticated user
+              $.ajax({
+                url: "https://api.spotify.com/v1/search",
+                method: "GET",
+                headers: {
+                  Authorization: "Bearer " + accessToken
+                },
+                data: {
+                  q: searchVal,
+                  type: "track",
+                  limit: 30
+                }
+              }).done(function(data) {
+                console.log(data);
+                $(songResultHolder).empty();
+                const tracks = data.tracks.items;
+                tracks.forEach(function(track) {
+                  const addedElement = $(songHTML);
+                  $(addedElement).find(".songName").text(track.name);
+                  let artistString = "";
+                  track.artists.forEach(function (artist) {
+                    artistString += artist.name + ", "
+                  });
+                  artistString = artistString.substr(0, artistString.length - 2);
+                  $(addedElement).find(".artistName").text(artistString);
+                  let image = {height: 9999999, width: 9999999, url: ""};
+                  track.album.images.some(function (img){
+                    if (img.height >= 64 && img.width >= 64) {
+                      if (img.height < image.height || img.width < image.width) {
+                        image = img;
+                      }
+                      if (image.height == 64 || image.width == 64) {
+                        return true;
+                      }
+                    }
+                  });
+                  if (image === undefined) {
+                    image = track.album.images[0];
+                  }
+                  $(addedElement).find(".albumCover").attr("src", image.url);
+                  //TODO check if already in queue
+                  $(songResultHolder).append(addedElement);
+                });
+                $(songResultHolder).wrap("<div></div>");
+                $(songResultHolder).unwrap();
+              }).fail(function(d) {
+                const data = d.responseJSON;
+                console.error(data);
+                if (data.error.status == 401) {
+                  console.log("Refreshing access token");
+                  $.ajax({
+                    url: "/auth/spotify/refreshAccessToken"
+                  }).done(function(data) {
+                    accessToken = data.accessToken;
+                    inputChanged();
+                  });
+                } 
+              });
+            }
+          });
+
             
 //- var ws = new WebSocket("ws://localhost:3001");
 //- ws.onopen = function (event) {
