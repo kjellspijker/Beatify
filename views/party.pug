@@ -3,8 +3,7 @@ extend layout
 block content
   section
     .row.w-100.m-0.vh-100-calc
-      .col-lg-2.col-sm-0
-      .col-lg-10.col-sm-12.pt-2.searchHolder
+      .col-lg-10.col-sm-12.pt-2.searchHolder.order-lg-3
         #searchTitle
           h4.display-4.text-center #{partyName}: 
             span#partyIdHolder
@@ -96,14 +95,16 @@ block content
             | Test song
           .row.song.bg-song-dark
             | Second test song
-      .w-100.d-block.d-lg-none
-      .col-lg-2.col-sm-12.py-2.sideBarHolder
+      .w-100.d-block.d-lg-none.order-lg-2
+      .col-lg-2.col-sm-12.py-2.sideBarHolder.order-lg-1
         | Lorem ipsum dolor sit amet, consectetur adipiscing elit. Aenean dapibus diam a purus hendrerit ultricies. Donec ac ante tincidunt, vestibulum lectus tempor, pulvinar nisl. Vivamus sed nulla sed elit laoreet placerat ac at ligula. Sed tempor vestibulum mauris vel molestie. Sed sed dolor sit amet massa tincidunt tempus. Nullam sit amet ante ante. Pellentesque suscipit est velit.
-        | Aliquam eu odio eu lectus auctor laoreet. In maximus porta rutrum. Pellentesque tincidunt tincidunt fermentum.
+        | Aliquam eu odio eu lectus auctor laoreet. In maximus porta rutrum. Pellentesque tincidunt tincidunt fermentum.1
         | Lorem ipsum dolor sit amet, consectetur adipiscing elit. Aenean dapibus diam a purus hendrerit ultricies. Donec ac ante tincidunt, vestibulum lectus tempor, pulvinar nisl. Vivamus sed nulla sed elit laoreet placerat ac at ligula. Sed tempor vestibulum mauris vel molestie. Sed sed dolor sit amet massa tincidunt tempus. Nullam sit amet ante ante. Pellentesque suscipit est velit.
-        | Aliquam eu odio eu lectus auctor laoreet. In maximus porta rutrum. Pellentesque tincidunt tincidunt fermentum.
+        | Aliquam eu odio eu lectus auctor laoreet. In maximus porta rutrum. Pellentesque tincidunt tincidunt fermentum.2
         | Lorem ipsum dolor sit amet, consectetur adipiscing elit. Aenean dapibus diam a purus hendrerit ultricies. Donec ac ante tincidunt, vestibulum lectus tempor, pulvinar nisl. Vivamus sed nulla sed elit laoreet placerat ac at ligula. Sed tempor vestibulum mauris vel molestie. Sed sed dolor sit amet massa tincidunt tempus. Nullam sit amet ante ante. Pellentesque suscipit est velit.
-        | Aliquam eu odio eu lectus auctor laoreet. In maximus porta rutrum. Pellentesque tincidunt tincidunt fermentum.
+        | Aliquam eu odio eu lectus auctor laoreet. In maximus porta rutrum. Pellentesque tincidunt tincidunt fermentum.3
+        .small-text
+          | SPACER
             
 //- var ws = new WebSocket("ws://localhost:3001");
 //- ws.onopen = function (event) {

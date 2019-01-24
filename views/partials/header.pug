@@ -8,13 +8,16 @@ nav.navbar.navbar-expand-lg.navbar-dark.navbar-custom(class=page == "party" ? "d
         #navbarResponsive.collapse.navbar-collapse
           ul.navbar-nav.ml-auto
             if !user
-              li.nav-item.dropdown
-                a#login.nav-link.dropdown-toggle(data-toggle="dropdown") Login
-                .dropdown-menu.navbar-custom(aria-labelledby="login")
-                  .social-buttons
-                    a.btn.btn-success.spotify(href="/auth/spotify")
-                      i.fa.fa-spotify
-                      | Login with Spotify
+              //- li.nav-item.dropdown
+              //-   a#login.nav-link.dropdown-toggle(data-toggle="dropdown") Login
+              //-   .dropdown-menu.navbar-custom.social-dropdown(aria-labelledby="login")
+              //-     .social-buttons
+              //-       a.btn.btn-md.rounded-pill.spotify-login-btn.smaller-spotify-btn(href="/auth/spotify")
+              //-         i.fa.fa-spotify
+              //-         | Login with Spotify
+              a.btn.btn-md.rounded-pill.spotify-login-btn.smaller-spotify-btn(href="/auth/spotify")
+                i.fa.fa-spotify
+                | &nbsp;&nbsp;Login with Spotify
             else
               li.nav-item.dropdown
                 a#logout.nav-link.dropdown-toggle(data-toggle="dropdown") Welcome, #{user.username}
