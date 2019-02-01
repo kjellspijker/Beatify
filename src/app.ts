@@ -5,24 +5,27 @@ import bodyParser from "body-parser";
 import logger from "./util/logger";
 import lusca from "lusca";
 import dotenv from "dotenv";
-import mongo from "connect-mongo";
+// import mongo from "connect-mongo";
 import flash from "express-flash";
 import path from "path";
-import mongoose from "mongoose";
+// import mongoose from "mongoose";
 import passport from "passport";
 import expressValidator from "express-validator";
 import bluebird, { any } from "bluebird";
-import { default as User, UserModel } from "./models/User";
-import { default as Party, PartyModel } from "./models/Party";
-import { default as Queue, QueueModel } from "./models/Queue";
-import { MONGODB_URI, SESSION_SECRET } from "./util/secrets";
+import { default as User } from "./models/User.model";
+import { default as Party } from "./models/Party.model";
+import { default as Queue } from "./models/Queue.model";
+import { MONGODB_URI, SESSION_SECRET, MYSQL_DATABASE, MYSQL_USERNAME, MYSQL_PASSWORD, MYSQL_HOST, MYSQL_PORT } from "./util/secrets";
 import { SPOTIFY_CLIENT_ID, SPOTIFY_CLIENT_SECRET, SPOTIFY_CALLBACK_URL } from "./util/secrets";
 import { main } from "./util/websocket";
+import { Sequelize } from "sequelize-typescript";
+const favicon = require("serve-favicon");
 const SpotifyStrategy = require("passport-spotify").Strategy;
 const randToken = require("rand-token");
 const request = require("request");
+const MySQLStore = require("express-mysql-session")(session);
 
-const MongoStore = mongo(session);
+// const MongoStore = mongo(session);
 
 // Load environment variables from .env file, where API keys and passwords are configured
 dotenv.config({ path: ".env" });
@@ -30,20 +33,49 @@ dotenv.config({ path: ".env" });
 // Controllers (route handlers)
 import * as homeController from "./controllers/home";
 import * as partyController from "./controllers/partyController";
-import { MongoError } from "mongodb";
+import { fstat, readFileSync } from "fs";
 
 // Create Express server
 const app = express();
 
-// Connect to MongoDB
-const mongoUrl = MONGODB_URI;
-(<any>mongoose).Promise = bluebird;
-mongoose.connect(mongoUrl, { useMongoClient: true }).then(
-  () => { /** ready to use. The `mongoose.connect()` promise resolves to undefined. */ },
-).catch(err => {
-  console.log("MongoDB connection error. Please make sure MongoDB is running. " + err);
-  // process.exit();
+// Connect to MySQL
+export const sequelize = new Sequelize({
+  database: MYSQL_DATABASE,
+  username: MYSQL_USERNAME,
+  password: MYSQL_PASSWORD,
+  host: MYSQL_HOST,
+  storage: ":memory:",
+  modelPaths: [__dirname + "/models"],
+  dialect: "mysql"
 });
+sequelize.authenticate()
+  .then(() => {
+    console.log("Connected to MySQL");
+    sequelize.sync().then(() => {
+      sequelize.query("DROP TRIGGER IF EXISTS BeforeNewUserUUIDGeneratorTrigger").then(() => {
+        const newUserTrigger = readFileSync("./sql/BeforeNewUserUUIDGeneratorTrigger.sql", "utf8");
+        sequelize.query(newUserTrigger).then(() => {
+          sequelize.query("DROP TRIGGER IF EXISTS BeforeNewPartyUUIDGeneratorTrigger").then(() => {
+            const newPartyTrigger = readFileSync("./sql/BeforeNewPartyUUIDGeneratorTrigger.sql", "utf8");
+            sequelize.query(newPartyTrigger);
+          });
+        });
+      });
+    });
+  })
+  .catch((err: any) => {
+    console.error("Unable to connect to MySQL: ", err);
+  });
+
+const MySQLStoreOptions = {
+  host: MYSQL_HOST,
+  port: MYSQL_PORT,
+  user: MYSQL_USERNAME,
+  password: MYSQL_PASSWORD,
+  database: MYSQL_DATABASE
+};
+
+const sessionStore = new MySQLStore(MySQLStoreOptions);
 
 // Express configuration
 app.set("port", process.env.PORT || 3000);
@@ -57,16 +89,20 @@ app.use(session({
   resave: true,
   saveUninitialized: true,
   secret: SESSION_SECRET,
-  store: new MongoStore({
-    url: mongoUrl,
-    autoReconnect: true
-  })
+  store: sessionStore
 }));
-app.use(passport.initialize());
-app.use(passport.session());
 app.use(flash());
 app.use(lusca.xframe("SAMEORIGIN"));
 app.use(lusca.xssProtection(true));
+
+app.use(
+  express.static(path.join(__dirname, "public"), { maxAge: 31557600000 })
+);
+app.use(favicon(path.join(__dirname, "public", "images", "favicon.ico")));
+
+// After here requires passport authorization
+app.use(passport.initialize());
+app.use(passport.session());
 app.use((req, res, next) => {
   res.locals.user = req.user;
   next();
@@ -86,17 +122,18 @@ app.use((req, res, next) => {
   next();
 });
 
-app.use(
-  express.static(path.join(__dirname, "public"), { maxAge: 31557600000 })
-);
-
-passport.serializeUser(function (user: UserModel, done) {
-  done(undefined, user.id);
+passport.serializeUser(function (user: User, done) {
+  done(undefined, user.userId);
 });
 
 passport.deserializeUser(function (spotifyId, done) {
-  User.findOne({ spotifyId: spotifyId }, function (err, user) {
-    done(err, user);
+  console.log("Deserializing");
+  User.findOne({
+    where: {
+      userId: spotifyId
+    }
+  }).then((user) => {
+    done(undefined, user);
   });
 });
 
@@ -107,29 +144,22 @@ passport.use(new SpotifyStrategy(
     callbackURL: SPOTIFY_CALLBACK_URL
   },
   function (accessToken: string, refreshToken: string, expires_in: number, profile: any, done: any) {
-    User.findOne({ spotifyId: profile.id }, function (err, user) {
-      if (err) {
-        return done(err);
+    User.findOrCreate({
+      where: {
+        spotifyId: profile.id
+      },
+      defaults: {
+        spotifyId: profile.id,
+        accessToken: accessToken,
+        refreshToken: refreshToken,
+        email: profile.emails[0].value,
+        username: profile.username,
+        country: profile.country
       }
-      if (!user) {
-        user = new User({
-          accessToken: accessToken,
-          refreshToken: refreshToken,
-          username: profile.username,
-          email: profile.emails[0].value,
-          country: profile.country,
-          spotifyId: profile.id
-        });
-        user.save(function (err) {
-          if (err) console.log(err);
-          return done(err, user);
-        });
-      } else {
-        return done(err, user);
-      }
-    });
-    process.nextTick(function () {
-      return done(undefined, profile);
+    }).spread((user, created) => {
+      return done(undefined, user);
+    }).catch(err => {
+      return done(err, undefined);
     });
   }
 ));
@@ -138,7 +168,6 @@ passport.use(new SpotifyStrategy(
  * Primary app routes.
  */
 app.get("/", homeController.index);
-// app.get("/login", homeController.login);
 app.get("/join/:id", partyController.join);
 app.get("/create", partyController.create);
 app.get("/auth/spotify", passport.authenticate("spotify", {
@@ -146,43 +175,33 @@ app.get("/auth/spotify", passport.authenticate("spotify", {
 }), function (req, res) {
 
 });
-const pid = 2;
 
 app.get("/party/:id", function (req, res) {
-  Party.findOne({ owner: req.params.id }, async function (err, party: PartyModel) {
-    if (err) {
-      req.flash("errors", err);
-      return res.redirect("/");
+  const id = parseInt(req.params.id, 16);
+  Party.findOrCreate({
+    where: {
+      UUID: id
+    },
+    defaults: {
+      owner: req.user.userId,
+      name: "TestName"
     }
-    if (!party) {
-      await generateParty(req.params.id).then(function (p: PartyModel) {
-        party = p;
-      });
-    }
+  }).spread((party: Party, created) => {
     res.render("party", {
       page: "party",
       title: req.user.username + "'s party",
       accessToken: req.user.accessToken,
-      partyId: party.get("partyId"),
-      partyName: party.get("name"),
+      partyId: party.UUID.toString(16),
+      partyName: party.name,
       url: "http://192.168.1.13:3000/join/" + party.id
     });
     return 0;
+  }).catch((err) => {
+    console.error(err);
+    req.flash("errors", JSON.stringify(err));
+    return res.redirect("/");
   });
 });
-
-async function generateParty(userId: string): Promise<mongoose.Document> {
-  const party = new Party({
-    owner: userId,
-    partyId: randToken.generate(8, "0123456789"),
-    name: "TestName"
-  });
-  return await party.save().then((saved) => {
-    return party;
-  }).catch((err) => {
-    return generateParty(userId);
-  });
-}
 
 app.get("/auth/spotify/callback", passport.authenticate("spotify", { failureRedirect: "/" }),
   function (req, res) {
@@ -205,12 +224,20 @@ app.get("/auth/spotify/refreshAccessToken", (req, res) => {
   }, (err: any, httpResponse: any, body: any) => {
     if (err) {
       console.error(err);
-      res.send(JSON.stringify({error: "spotify-error", message: err}));
+      res.send(JSON.stringify({ error: "spotify-error", message: err }));
     } else {
       const data = JSON.parse(body);
       req.user.accessToken = data.access_token;
-      User.updateOne({_id: req.user.id }, {accessToken: data.access_token});
-      res.send(JSON.stringify({accessToken: data.access_token}));
+      User.update(
+        {
+          accessToken: data.access_token
+        },
+        {
+          where: {
+            userId: req.user.userId
+          }
+        });
+      res.send(JSON.stringify({ accessToken: data.access_token }));
     }
   });
 });

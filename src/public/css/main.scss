@@ -1,5 +1,4 @@
 @import "lib/bootstrap/bootstrap";
-// @import "lib/font-awesome/fontawesome.scss";
 
 $black: #000;
 $black_70: rgba(0,0,0,.7);
@@ -32,26 +31,58 @@ $font_1: Catamaran;
 	background-color: rgb(37, 41, 46);
 }
 
+.songHolder::-webkit-scrollbar-thumb {
+	-webkit-box-shadow: inset 0 0 6px transparent;
+	background-color: rgba(255, 255, 255, 0.3);
+}
+
+#queueSongHolder {
+	.emptyQueueHolder:only-child {
+		display: flex;
+		padding-top: 1rem;
+		padding-bottom: 1rem;
+		justify-content: center;
+		text-align: center;
+	}
+
+	.emptyQueueHolder:not(:only-child) {
+		display: none;
+	}
+}
+
 .songHolder {
 	background-color: #1c1f24;
 	position: relative;
-	// overflow: hidden;
+	
 	@media(min-width: 992px) {
 		height: calc(100vh - 15.325rem);
 		overflow-y: auto;
 	}
 	scrollbar-color: rgba(255, 255, 255, 0.3) transparent;
-}
 
-#songResultHolder::-webkit-scrollbar-thumb {
-	-webkit-box-shadow: inset 0 0 6px transparent;
-	background-color: rgba(255, 255, 255, 0.3);
-}
+	.spinnerHolder:only-child {
+		display: flex;
+		width: 100%;
+		justify-content: center;
+		font-size: xx-large;
+		padding-top: 1rem;
+		padding-bottom: 1rem;
+	}
 
-.songHolder {
+	.spinnerHolder:not(:only-child) {
+		display: none;
+	}
+
 	.song {
 		padding-top: 0.5rem;
 		padding-bottom: 0.25rem;
+
+		.fa-play {
+			color: white;
+			background-color: darkred;
+			padding: 0.9rem;
+			font-size: 0.8rem;
+		}
 
 		.albumCover {
 			max-height: 64px;
@@ -86,9 +117,6 @@ $font_1: Catamaran;
 
 		.btn-add-song {
 			color: white;
-			// position: absolute;
-			// right: 0.5rem;
-			// top: 1.3rem;
 		}
 	}
 }
@@ -153,6 +181,10 @@ footer {
 		#searchInputPrepend {
 			background-color: white;
 			border-right: none;
+
+			#back-prepend {
+				cursor: pointer;
+			}
 		}
 
 		input {

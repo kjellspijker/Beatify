@@ -8,7 +8,7 @@ block header
           h2.masthead-subheading.mb-0 All you add is Music!
           if user
             .masthead-btn-holder
-              a.btn.btn-primary.btn-xl.rounded-pill.mt-5(href='/party/' + user.id) Create a party
+              a.btn.btn-primary.btn-xl.rounded-pill.mt-5(href='/party/' + user.UUID.toString(16)) Create a party
             .masthead-btn-holder
               a.btn.btn-primary.btn-xl.rounded-pill.mt-3(href='#') Join a party
           else

@@ -14,6 +14,11 @@ const prod = ENVIRONMENT === "production"; // Anything else is treated as 'dev'
 
 export const SESSION_SECRET = process.env["SESSION_SECRET"];
 export const MONGODB_URI = prod ? process.env["MONGODB_URI"] : process.env["MONGODB_URI_LOCAL"];
+export const MYSQL_HOST = process.env["MYSQL_HOST"];
+export const MYSQL_PORT = process.env["MYSQL_PORT"];
+export const MYSQL_USERNAME = process.env["MYSQL_USERNAME"];
+export const MYSQL_PASSWORD = process.env["MYSQL_PASSWORD"];
+export const MYSQL_DATABASE = process.env["MYSQL_DATABASE"];
 
 export const SPOTIFY_CLIENT_ID = process.env["SPOTIFY_CLIENT_ID"];
 export const SPOTIFY_CLIENT_SECRET = process.env["SPOTIFY_CLIENT_SECRET"];

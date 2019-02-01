@@ -13,13 +13,3 @@ export let index = (req: Request, res: Response) => {
     title: "Home"
   });
 };
-
-export let login = (req: Request, res: Response) => {
-  console.log(req.param("username"));
-  res.render("home", {
-    title: "Home",
-    user: {
-      username: req.param("username")
-    }
-  });
-};
