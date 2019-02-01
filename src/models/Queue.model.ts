@@ -18,15 +18,6 @@ export default class Queue extends Model<Queue> {
     @Column(DataType.STRING)
     songUri: string;
 
-    @Column(DataType.TEXT)
-    songName: string;
-
-    @Column(DataType.TEXT)
-    artistName: string;
-
-    @Column(DataType.TEXT)
-    albumImage: string;
-
     @Column(DataType.INTEGER)
     votes: number;
 }

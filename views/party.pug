@@ -39,6 +39,7 @@ block content
         .small-text
           | SPACER
     script.
+      const queueMap = new Map();
       const songHTML = '<div class="row song container-fluid"><img class="col-2 px-0 img-fluid d-inline-block albumCover" src="https://i.scdn.co/image/ecd0fcd1e6202f2d1625e540cfd44acf1fac7f53"><div class="songInfo col-10 col-sm-9 col-lg-10 d-inline-block"><h5 class="songName">Now this is a very long song name of some long song that is in the spotify database</h5><div class="artistQueue"> <span class="artistName">Disturbed</span><span class="bar">&nbsp;| </span><span class="QueueStatus">Not in Queue</span></div></div><div class="col d-flex align-items-center justify-content-center justify-content-sm-end"><div class="btn btn-add-song"><span class="fas fa-plus"></span></div></div></div>';
       const queueHTML = '<div class="row song container-fluid"><img class="col-2 px-0 img-fluid d-inline-block albumCover" src="https://i.scdn.co/image/ecd0fcd1e6202f2d1625e540cfd44acf1fac7f53"><div class="songInfo col-10 col-sm-9 col-lg-10 d-inline-block"><h5 class="songName">Now this is a very long song name of some long song that is in the spotify database</h5><div class="artistQueue"> <span class="artistName">Disturbed</span><span class="bar">&nbsp;| </span><span class="QueueStatus">Not in Queue</span></div></div><div class="col d-flex align-items-center justify-content-center justify-content-sm-end"><div class="btn btn-add-song"><span class="fas fa-play rounded-circle"></span></div></div></div>';
       let accessToken = "#{accessToken}";
@@ -117,7 +118,6 @@ block content
                   }
                   $(addedElement).find(".albumCover").attr("src", image.url);
                   $(addedElement).find(".btn-add-song").attr("data-songUri", track.id)
-                  //TODO check if already in queue
                   $(songResultHolder).append(addedElement);
                 });
                 $(songResultHolder).wrap("<div></div>");
@@ -136,7 +136,8 @@ block content
                 } 
               });
             }
-            function addSongToQueue(track) {
+            function addSongToQueue(track, votes) {
+              console.log("Adding to queue");
               const addedElement = $(queueHTML);
               $(addedElement).find(".songName").text(track.name);
               let artistString = "";
@@ -160,8 +161,7 @@ block content
                 image = track.album.images[0];
               }
               $(addedElement).find(".albumCover").attr("src", image.url);
-              //TODO check if already in queue
-              $(queueSongHolder).append(addedElement);
+              queueMap.set(track.id, {html: addedElement, votes: votes});
             }
 
             function getTrackFromUri(spotifyUri) {
@@ -178,34 +178,74 @@ block content
                       limit: 30
                     }
                   }).done(function(data) {
-                    console.log(JSON.stringify(data));
+                    //- console.log(JSON.stringify(data));
                     resolve(data);
                   }).catch(function (err) {
                     console.error(err);
                   });
               });
             }
+
+            function updateSongOrder() {
+              console.log("Updating order");
+              $(queueSongHolder).empty();
+              try {
+                const sortedQueue = new Map([...queueMap.entries()].sort((a, b) => b[1].votes - a[1].votes));
+                sortedQueue.forEach((value, key) => {
+                  $(queueSongHolder).append(value.html);
+                });
+              } catch (e) {
+                console.error(e);
+              }
+            }
+
+            function loadQueue(queue) {
+              console.log(queue);
+              let counter = queue.length;
+              queue.forEach((item) => {
+                getTrackFromUri(item.uri).then(function (data){
+                  addSongToQueue(data, item.votes);
+                  counter--;
+                  if (counter == 0) {
+                    updateSongOrder();
+                  }
+                }, function (err) {
+                  console.error(err);
+                });
+              });
+            }
           
             $(songResultHolder).on("click", ".btn-add-song", function() {
-              getTrackFromUri($(this).attr("data-songuri")).then(function (data) {
-                // TODO send the track (or id?) to server. Server pushes added track to listening clients
-                addSongToQueue(data);
-              }, function (err) {
-                console.error(err);
-              });
+              ws.send(JSON.stringify({jsonrpc: 2.0, method: "addUriToQueue", params: {partyId: "#{partyId}", uri: $(this).attr("data-songuri")}}));
             });
 
             $("#back-prepend").on("click", function() {
               $(searchInput).val("").trigger("input");
             });
 
-            //- var ws = new WebSocket("ws://localhost:3001");
-            //- ws.onopen = function (event) {
-            //-   console.log("Connected");
-            //-   ws.send("Hello, World!");
-            //- }
+            var ws = new WebSocket("ws://192.168.1.13:3001");
+            ws.onopen = function (event) {
+              console.log("Connected");
+              ws.send(JSON.stringify({jsonrpc: 2.0, method: "loadQueue", params: {partyId: "#{partyId}"}}));
+            }
 
-            //- ws.onmessage = function(event) {
-            //-   console.log(event.data);
-            //- }
+            ws.onmessage = function(event) {
+              try {
+                const msg = JSON.parse(event.data);
+                if (msg.method == "addSongToQueue") {
+                  getTrackFromUri(msg.params.uri).then(function (data) {
+                    // TODO send the track (or id?) to server. Server pushes added track to listening clients
+                    addSongToQueue(data, msg.params.votes);
+                    console.log("Done");
+                    updateSongOrder();
+                  }, function (err) {
+                    console.error(err);
+                  });
+                } else if (msg.method == "loadQueue") {
+                  loadQueue(msg.params.queue);
+                }
+              } catch (e) {
+                console.error(e);
+              }
+            }
           });
